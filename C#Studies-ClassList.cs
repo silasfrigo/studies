@@ -11,7 +11,6 @@ namespace TrabalhoVania
         static void Main(string[] args)
         {
 
-            float aumento = 20;
             //Variáveis para o cadastro
             int escolha = 0;
 
@@ -23,19 +22,17 @@ namespace TrabalhoVania
 
             while (escolha != 9)
             {
-               // string nome, refer, rg, cpf, dept;
-                //double salario;
+                string cpf;
 
                 Console.WriteLine("1  - Cadastrar um funcionario");
                 Console.WriteLine("2  - Exibir todos os funcionarios");
                 Console.WriteLine("3  - Alterar todos dados de um funcionario com determinado CPF");
                 Console.WriteLine("4  - Conceder aumento para determinado funcionario");
                 Console.WriteLine("5  - Exibir salario de todos funcionarios");
-                Console.WriteLine("6  - para adicionar salario extra");
-                Console.WriteLine("7  - Buscar um funcionario pelo CPF");
-                Console.WriteLine("8  - Exibir ganhos anuais de todos funcionarios");
-                Console.WriteLine("9  - Exibir funcionarios com salarios extras");
-                Console.WriteLine("10 - para Sair");
+                Console.WriteLine("6  - Buscar um funcionario pelo CPF");
+                Console.WriteLine("7  - Exibir ganhos anuais de todos funcionarios");
+                Console.WriteLine("8  - Exibir funcionarios com salarios extras");
+                Console.WriteLine("9 -  Sair do programa");
 
                 escolha = Convert.ToInt32(Console.ReadLine());
                 if (escolha == 1)
@@ -50,11 +47,11 @@ namespace TrabalhoVania
                 }
                 else if (escolha == 3)
                 {
-                    Console.WriteLine("Digite o nome do funcionario que deseja alterar os dados");
-                    refer = Console.ReadLine();
+                    Console.WriteLine("Digite o CPF do funcionario que deseja alterar os dados");
+                    cpf = Console.ReadLine();
 
 
-                    e1.AlterarFuncionarios(refer);
+                    e1.AlterarFuncionarios(cpf);
                 }
                 else if (escolha == 4)
                 {
@@ -84,12 +81,11 @@ namespace TrabalhoVania
         }
     }
 
-   /* interface SalarioExtra
+    interface ISalarioExtra
     {
         void CalculaExtra();
-    }*/
-
-    public class Funcionario
+    }
+    public class Funcionario : ISalarioExtra
     {
 
         public string Rg {get; set;}
@@ -100,21 +96,19 @@ namespace TrabalhoVania
         public double Salario {get; set;}
         public string Cpf {get; set;}
         public double CargaH {get; set;}
-        //public Funcionario() { }
-
-        public void Mostra()
+             
+        public void CalculaExtra()
         {
-            /*Console.WriteLine("Nome Do Funcionario :" + Nome);
-            Console.WriteLine("Salario Do Funcionario :" + Salario);
-            Console.WriteLine("Departamento Do Funcionario :" + Dept);
-            if (Dept == "Producao" || Dept == "producao" || Dept == "Produção" || Dept == "produção") { Console.WriteLine("Turno do funcionario: " + Turno); }
-            Console.WriteLine("Rg Do Funcionario :" + Rg);
-            if (Dept == "Vendas" || Dept == "vendas") { Console.WriteLine("Carga do funcionario: " + Carga); }
-            Console.Write("Cpf do funcionario " + Cpf);
-            */
-        }
+            int salario_extra = 0;
 
-        
+
+            if (cargaH <= 10) salario_extra += 75;
+            if (cargaH > 10 && cargaH <= 15) salario_extra += 100;
+            if (cargaH > 15 && cargaH <= 20) salario_extra += 150;
+            if (cargaH > 20 && cargaH <= 25) salario_extra += 200;
+            if (cargaH > 25) salario_extra += 250;
+            return salario_extra;
+        }
         
     }
     class Empresa
@@ -125,14 +119,11 @@ namespace TrabalhoVania
 
         List<Funcionario> Funcionarios = new List<Funcionario>();
 
-
-
-
-
+                     
         public Empresa() { }
         public void CadastroFuncionario()
         {
-            string nome, refer, rg, cpf, dept, turno = " ";
+            string nome, rg, cpf, dept, turno = " ";
             double salario, carga = 0;
             Console.WriteLine("Entre com o nome");
             nome = Console.ReadLine();
@@ -166,9 +157,7 @@ namespace TrabalhoVania
                 salario += salario_extra;
                 Console.WriteLine("Salario reajustado para: " + salario + " por conta da carga horaria no departamento de vendas");
                 
-            }
-
-            
+            }            
 
             Funcionario funcionario1 = new Funcionario()
             {
@@ -192,21 +181,22 @@ namespace TrabalhoVania
                    }
                    else
                    {
-                foreach (Funcionario func in Funcionarios)
-                {
-                    Console.WriteLine("Nome: " + func.Nome);
-                    Console.WriteLine("Rg: " + func.Rg);
-                    Console.WriteLine("Salario: " + func.Salario);
-                    Console.WriteLine("Departamento: " + func.Dept);
-                    if (func.Dept == "Producao")
-                        Console.WriteLine("Turno: " + func.Turno);
-                    if (func.Dept == "Vendas")
-                        Console.WriteLine("Carga Horaria: " + func.CargaH);
-                    Console.WriteLine("Cpf: " + func.Cpf);
-                    Console.WriteLine("\n");
 
-                       }
-                   }
+                        foreach (Funcionario func in Funcionarios)
+                        {
+                            Console.WriteLine("Nome: " + func.Nome);
+                            Console.WriteLine("Rg: " + func.Rg);
+                            Console.WriteLine("Salario: " + func.Salario);
+                            Console.WriteLine("Departamento: " + func.Dept);
+                            if (func.Dept == "Producao")
+                                Console.WriteLine("Turno: " + func.Turno);
+                            if (func.Dept == "Vendas")
+                                Console.WriteLine("Carga Horaria: " + func.CargaH);
+                            Console.WriteLine("Cpf: " + func.Cpf);
+                            Console.WriteLine("\n");
+
+                               }
+                           }
         }
         public void MostraSalarios()
         {
@@ -225,17 +215,6 @@ namespace TrabalhoVania
                     Console.WriteLine("\n");
                 }
             }
-            /*
-                    Console.WriteLine("Funcionario " + z);
-                    Console.WriteLine("Nome Do Funcionario :" + f1[z].Nome);
-                    Console.WriteLine("Salario Do Funcionario :" + f1[z].Salario);
-                    Console.WriteLine("Ganho Anual:"); calculaGanhoAnual(z);
-                    Console.WriteLine("\n ");
-              */
-            /* else
-             {
-                 Console.WriteLine("Não existe funcionarios cadastrados");
-             }*/
         }
 
 
@@ -243,7 +222,6 @@ namespace TrabalhoVania
         public void AlterarFuncionarios(string cpf)
         {
             int aux = 0;
-            bool change = false;
             bool isEmpty = !Funcionarios.Any();
             if (isEmpty)
             {
@@ -338,7 +316,7 @@ namespace TrabalhoVania
             return 0;
         }
 
-        public int CalculaExtra(double cargaH)
+        public int CalcularExtras(double cargaH)
         {
             int salario_extra = 0;
 
@@ -351,22 +329,7 @@ namespace TrabalhoVania
             return salario_extra;
 
         }
-
-        public void Extra()
-        {
-            /*
-            if (f1[0] != null)
-            {
-                for (int x = 0; x < i; x++)
-                    f1[x].CalculaExtra();
-
-                Console.WriteLine("Os salários foram atualizados");
-            }
-            else
-            {
-                Console.WriteLine("Não existem funcionários cadastrados");
-            }*/
-        }
+                
         public void BuscaFuncionario(string cpf)
         {
             int aux = 0;
@@ -417,22 +380,6 @@ namespace TrabalhoVania
                     BuscaFuncionario(func.Cpf);
                 }
             }
-            
-            /*
-            if (f1[0] != null)
-            {
-                for (int x = 0; x < i; x++)
-                {
-                    if (f1[x].Aumento != false)
-                    {
-                        f1[x].Mostra();
-                    }
-                }
             }
-            else
-            {
-                Console.WriteLine("Usuarios nao cadastrados");
-            }
-        */}
     }
 }

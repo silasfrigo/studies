@@ -1,0 +1,612 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApplication2
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            float aumento = 20;
+            //Variáveis para o cadastro
+            int escolha=0;
+
+            Empresa e1 = new Empresa();
+
+            while(escolha!=13)
+            {
+                
+                string nome, refer, rg, cpf, dept, turno = " ",empresa;
+                double salario, carga = 0;
+
+                Console.WriteLine("\nMENU");
+               
+                Console.WriteLine("Digite 1 para efetuar o cadastro de um funcionario");
+                Console.WriteLine("Digite 2 para visualizar funcionarios");
+                Console.WriteLine("Digite 3 para alterar registros de um usuario ");
+                Console.WriteLine("Digite 4 para dar um aumento de salario");
+                Console.WriteLine("Digite 5 para visualizar salario dos funcionarios");
+                Console.WriteLine("Digite 6 para adicionar salario extra");
+                Console.WriteLine("Digite 7 para procurar um funcionario");
+                Console.WriteLine("Digite 8 para ver ganhos anuais");
+                Console.WriteLine("Digite 9 para ver funcionarios com salarios extras");
+                Console.WriteLine("Digite 10 para cadastrar uma empresa");
+                Console.WriteLine("Digite 11 para alterar dados de uma empresa");
+                Console.WriteLine("Digite 12 para visualizar empresa(s)");
+                Console.WriteLine("Digite 13 para sair");
+
+                escolha = Convert.ToInt32(Console.ReadLine());
+
+                if (escolha == 1)
+            {
+                    bool permissao = false;
+
+                   
+                Console.WriteLine("Digite o nome do funcionário");
+                nome = Console.ReadLine();
+                Console.WriteLine("Digite o rg do funcionário");
+                rg = Console.ReadLine();
+                Console.WriteLine("Digite o departamento do funcionário");
+                dept = Console.ReadLine();
+
+                    if (dept=="Producao" || dept == "producao" || dept == "Produção" || dept == "produção")
+                { 
+                    Console.WriteLine("Digite o turno de trabalho");
+                    turno = Console.ReadLine();
+                }
+                
+                Console.WriteLine("Digite o salario do funcionário");
+                salario =Convert.ToDouble(Console.ReadLine());
+
+                Console.WriteLine("Digite o cpf do funcionário");
+                cpf = Console.ReadLine();
+
+                Console.WriteLine("Digite o cnpj da empresa à qual o funcionário esta afiliado");
+                empresa = Console.ReadLine();
+
+
+
+                    permissao = e1.Check(cpf, empresa);
+                    if(permissao==true)
+                    { 
+                    e1.CadastroFuncionario(nome, rg, dept, salario,turno,carga,cpf);
+                    }
+                    else
+                    {
+                        Console.WriteLine("O cadastro não foi completo:");
+                        Console.WriteLine("Possíveis Erros:");
+                        Console.WriteLine("1-Este cpf já está cadastrado");
+                        Console.WriteLine("2-A empresa à qual o funcionario foi cadastrado não existe");
+                        
+                    }
+
+
+                }
+                else if (escolha == 2){
+
+                e1.InfoFuncionarios();
+
+            }else if(escolha==3){
+                Console.WriteLine("Digite o cpf do funcionario que deseja alterar");
+                refer = Console.ReadLine();
+                
+
+                e1.AlterarFuncionarios(refer);
+            }else if (escolha == 4){
+                    
+                    Console.WriteLine("Digite o cpf do funcionario que deseja realizar o aumento");
+                    nome = Console.ReadLine();
+                    e1.AumentoSalario(nome);
+            }else if (escolha == 5)
+                {
+                    e1.MostraFuncionarios();
+            }else if (escolha == 6)
+                {
+                    Console.WriteLine("Digite o cpf do funcionario para lhe dar um salário extra");
+                    cpf=Console.ReadLine();
+                    e1.Extra(cpf);
+                    
+                }else if(escolha ==7)
+                {
+                    
+                    Console.WriteLine("Digite o cpf do funcionário que deseja encontrar");
+                    cpf = Console.ReadLine();
+                    e1.Consulta(cpf);
+                }else if (escolha == 8)
+                {
+                    e1.GanhosAnuais();
+                }else if(escolha == 9)
+                {
+                    e1.Extras();
+                }else if(escolha == 10)
+                {
+                    string cnpj, n, razao;
+                    Console.WriteLine("Cadastro de empresa");
+                    Console.WriteLine("Digite o cnpj da empresa");
+                    cnpj = Console.ReadLine();
+                    Console.WriteLine("Digite o nome da empresa");
+                    n = Console.ReadLine();
+                    Console.WriteLine("Digite a razão social da empresa");
+                    razao = Console.ReadLine();
+
+                    if(e1.Check2(cnpj)==true)
+                    {
+                        e1.CadastroEmpresa(cnpj,n,razao);
+                    }else { Console.WriteLine("Cadastro não efetuado pois o\nCnpj já está cadastrado"); }
+                }else if (escolha == 11)
+                {
+                    
+                    Console.WriteLine("Digite o cnpj da empresa que deseja alterar ");
+                    turno=Console.ReadLine();
+                    e1.AlterarEmpresa(turno);
+
+                } else if(escolha ==12){
+                    e1.MostrarEmpresas();
+                }
+            }
+        }
+    }
+
+    interface SalarioExtra
+    {
+        void CalculaExtra(double carga);
+    }
+
+    public class  Funcionario : SalarioExtra
+    {
+        public string Rg { get; set; }
+        public string Nome { get; set; }
+        
+        public string Dept { get; set; }
+        public string Empresa { get; set; }
+        public bool Aumento  { get; set; }
+        public string Turno { get; set; }
+        public double Salario { get; set; }
+        public string Cpf { get; set; }
+        public double Carga { get; set; }
+        public Funcionario() { }
+
+        public void Mostra()
+        { 
+        Console.WriteLine("Nome Do Funcionario :" + Nome);
+        Console.WriteLine("Salario Do Funcionario :" + Salario);
+        Console.WriteLine("Departamento Do Funcionario :" + Dept);
+        if(Dept == "Producao" || Dept == "producao" || Dept == "Produção" || Dept == "produção") { Console.WriteLine("Turno do funcionario: " + Turno); }
+        Console.WriteLine("Rg Do Funcionario :" + Rg );
+        Console.WriteLine("Cpf do funcionario " + Cpf);
+
+        }
+
+        
+
+
+
+        public void CalculaExtra(double carga)
+        {
+            if(Dept=="Vendas")
+            {
+            if (carga <= 10) { 
+                { Salario += 75; }
+            }else if (carga > 10 && Carga <= 15) { Salario += 100; 
+            }else if (carga > 15 && Carga <= 20) { Salario += 150; 
+            }else if (carga > 20 && Carga <= 25) { Salario += 200;
+            }else if (carga > 25){ Salario += 150; }
+            Console.WriteLine("Os salários foram atualizados");
+                Aumento = true;
+            }else{
+                Console.WriteLine("O funcionário não pertence ao departamento de vendas\noperação incompleta");
+            }
+
+            
+        }
+    }
+    class Empresa
+    {
+        public string Cnpj { get; set; }
+        public string Nome { get; set; }
+        public string RazaoSocial { get; set; }
+
+        private int i = 0;
+        private int z = 0;
+
+        Funcionario[] f1 = new Funcionario[10];
+        Empresa[] empresa = new Empresa[10];
+        
+       
+
+
+        public Empresa() { }
+
+        public void MostraEmpresa()
+        {
+            Console.WriteLine("Nome Da Empresa :" + Nome);
+            Console.WriteLine("Cnpj Da Empresa :" + Cnpj);
+            Console.WriteLine("Razão Social Da Empresa :" + RazaoSocial);
+        }
+
+
+        public void MostrarEmpresas()
+        {
+            int escolha = 0;
+
+            if (empresa[0] != null)
+            {
+            Console.WriteLine("Digite 1 para procurar uma empresa especifica");
+            Console.WriteLine("Digite 2 para listar todas as empresas");
+            escolha = Convert.ToInt32(Console.ReadLine());
+
+            
+                if (escolha == 1)
+            {
+                    Console.WriteLine("Digite o cnpj da empresa que se deseja encontrar");
+                    string cnpj = Console.ReadLine();
+                    for(int x=0;x<z;x++)
+                    {
+                        if (empresa[x].Cnpj == cnpj)
+                        {
+                            empresa[x].MostraEmpresa();                        
+                        }
+
+                    }
+
+            }else if (escolha == 2) { 
+            
+            for(int x = 0; x < z; x++)
+                    { 
+                    empresa[x].MostraEmpresa();
+                    }
+
+                }
+            }else{
+                Console.WriteLine("Nenhuma empresa Cadastrada");
+            }
+         }
+        
+
+
+        public bool Check2(string cnpj)
+        {
+            if (empresa[0] != null)
+            {
+                for (int x = 0; x < z; x++)
+                {
+                    if (empresa[x].Cnpj == cnpj)
+                        return false;
+                }
+            }
+            return true;
+            
+
+        }
+        public bool Check(string cpf,string cnpj)
+        {
+           if (f1[0]!=null)
+            { 
+                for(int x=0;x<i;x++)
+                {
+                    if (f1[x].Cpf == cpf)
+                        return false;
+                }
+            }
+            if (empresa[0]!=null)
+            {
+                for(int x=0;x<i;x++)
+                {
+                    if (empresa[x].Cnpj != cnpj)
+                        return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+        public void CadastroFuncionario(string nome, string rg, string dept, double salario,string turno,double carga,string cpf)
+        {
+            if (i < 10)
+            {
+                f1[i] = new Funcionario();
+              
+                f1[i].Nome = nome;
+                f1[i].Rg = rg;
+                f1[i].Turno = turno;
+                f1[i].Carga = carga;
+                f1[i].Dept = dept;
+                f1[i].Salario = salario;
+                f1[i].Cpf = cpf;
+                f1[i].Aumento = false;
+                i++;
+            }
+        }
+        
+        public void CadastroEmpresa(string cnpj,string nome,string razaosocial)
+        {
+            if(z<10)
+            {
+                empresa[z] = new Empresa();
+                empresa[z].Cnpj = cnpj;
+                empresa[z].Nome = nome;
+                empresa[z].RazaoSocial = razaosocial;
+                z++;
+            }
+        }
+
+
+        public void InfoFuncionarios()
+        {
+            if (f1[0] != null)
+            {
+                for (int z = 0; z < i; z++)
+                {
+
+
+                    Console.WriteLine("Funcionario " + z);
+                    f1[z].Mostra();
+                    calculaGanhoAnual(z) ;
+                    Console.WriteLine("\n ");
+
+                    
+                }
+            } else {
+                Console.WriteLine("Não existe funcionarios cadastrados");
+            }
+        }
+        public void MostraFuncionarios()
+        {
+            if (f1[0] != null)
+            {
+                for (int z = 0; z < i; z++)
+                {
+
+                    Console.WriteLine("Funcionario " + z);
+                    Console.WriteLine("Nome Do Funcionario :" + f1[z].Nome);
+                    Console.WriteLine("Salario Do Funcionario :" + f1[z].Salario);
+                    calculaGanhoAnual(z);
+                    Console.WriteLine("\n ");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Não existe funcionarios cadastrados");
+            }
+        }
+
+
+
+        public void AlterarFuncionarios(string refer)
+        {
+            int x = 0;
+            bool change = false;
+
+            for (int z = 0; z < i; z++)
+            {
+                if (f1[z].Cpf == refer)
+                {
+                    z = x;
+                    change = true;
+                }
+            }
+
+            if (change == true)
+            {
+                string turno = "";
+                double carga = 0;
+                Console.WriteLine("Alterando Funcionário: \n");
+                Console.WriteLine("Digite o nome do  funcionário");
+                string nome = Console.ReadLine();
+                Console.WriteLine("Digite o cpf do funcionário");
+                string rg = Console.ReadLine();
+                Console.WriteLine("Digite o departamento em que o funcionário trabalha:");
+                string dept = Console.ReadLine();
+                Console.WriteLine("Digite o salario do funcionário");
+                float salario = float.Parse(Console.ReadLine());
+
+                if (dept == "Producao" || dept == "producao" || dept == "Produção" || dept == "produção")
+                {
+                    Console.WriteLine("Digite o turno do funcionário");
+                    turno = Console.ReadLine();
+                }
+                if (dept == "Carga" || dept == "carga" )
+                {
+                    Console.WriteLine("Digite a carga do funcionário");
+                    carga = Convert.ToDouble(Console.ReadLine());
+                }
+
+                f1[x].Nome = nome;
+                f1[x].Rg = rg;
+                f1[x].Dept = dept;
+                f1[x].Salario = salario;
+                f1[x].Carga = carga;
+                f1[x].Turno = turno;
+                f1[x].Aumento = false;
+            } else {
+                Console.WriteLine("Cpf nao encontrado impossibilitando a alteração de dados");
+            }
+
+
+        }
+
+        public void AlterarEmpresa(string refer)
+        {
+            int c = 0;
+            bool change = false;
+
+            for (int x = 0; x < z; x++)
+            {
+                if (empresa[x].Cnpj == refer)
+                {
+                    c = x;
+                    change = true;
+                }
+            }
+
+            if (change == true)
+            {
+                string turno = "";
+                double carga = 0;
+
+                Console.WriteLine("Alterando Empresa: \n");
+                Console.WriteLine("Digite o nome da empresa");
+                string nome = Console.ReadLine();
+                Console.WriteLine("Digite o cnpj da empresa");
+                string cnpj = Console.ReadLine();
+                Console.WriteLine("Digite a razão social da empresa: ");
+                string razao = Console.ReadLine();
+                
+                empresa[c].Nome = nome;
+                empresa[c].Cnpj = nome;
+                empresa[c].Nome = nome;
+            }
+            else
+            {
+                Console.WriteLine("Cnpj inexistente nos registros");
+            }
+        }
+
+
+            public void AumentoSalario(string refer)
+        {
+            double p;
+            int x = 0;
+            bool change = false;
+
+            for (int z = 0; z < i; z++)
+            {
+                if (f1[z].Cpf == refer)
+                {
+                    z = x;
+                    change = true;
+                }
+            }
+
+            if (change == true)
+            {
+                Console.WriteLine("Digite a porcentagem do aumento");
+                p = Convert.ToDouble(Console.ReadLine());
+                f1[x].Salario += f1[x].Salario * p / 100;
+                f1[x].Aumento = true;
+            } else {
+                Console.WriteLine("Funcionario não encontrado");
+            }
+
+
+        }
+        public void calculaGanhoAnual(int refer)
+        {
+
+            Console.WriteLine("\n Ganho Anual: " + f1[refer].Salario * 12);
+        }
+
+        public void Extra(string cpf)
+        {
+            double aumento;
+            if(f1[0]!=null)
+            { 
+                for(int x=0;x<i;x++)
+                {
+                    if (f1[x].Cpf==cpf)
+                    {
+                        Console.WriteLine("Digite o valor da carga de horário do trabalhador");
+                        aumento = Convert.ToDouble(Console.ReadLine());
+                        f1[x].CalculaExtra(aumento);
+                    }
+                }
+
+               
+            }
+            else {
+                Console.WriteLine("Não existem funcionários cadastrados");
+            }
+        }
+        public void Consulta(string cpf)
+        {
+            bool encontrado = false;
+
+            if (f1[0] != null)
+            {
+                for (int x = 0; x < i; x++)
+                {
+                    if(f1[x].Cpf==cpf)
+                    {
+                        Console.WriteLine("Funcionario Encontrado");
+                        f1[x].Mostra();
+                        encontrado= true;
+                        
+                    }
+                }
+                if (encontrado == false)
+                {
+                    Console.WriteLine("Funcionario não existente");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Usuario nao cadastrado");
+            }
+
+        }
+        public void GanhosAnuais()
+        {
+            int escolha = 0;
+            Console.WriteLine("Ganhos Anuais: ");
+            Console.WriteLine("Digite 1 para ver o ganho anual de um unico usuario");
+            Console.WriteLine("Digite 2 para ver o ganho anual de todos os usuarios");
+            escolha=Convert.ToInt32(Console.ReadLine());
+
+            if (f1[0] != null)
+            {
+                if (escolha == 1)
+                {
+                    string cpf;
+                    Console.WriteLine("Digite o cpf");
+                    cpf=Console.ReadLine();
+                    for (int x = 0; x < i; x++)
+                    {
+                        if(f1[x].Cpf==cpf)
+                        {
+                            Console.WriteLine("Funcionario" + x);
+                            Console.WriteLine(f1[x].Nome);
+                            calculaGanhoAnual(x);
+                        }
+                    }
+                }else { 
+            
+                for (int x = 0; x < i; x++)
+                {
+                        Console.WriteLine("Funcionario" + x);
+                        Console.WriteLine(f1[x].Nome);
+                        calculaGanhoAnual(x);
+                }
+                }
+            }else{
+                Console.WriteLine("Lista de funcionarios Vazia");
+            }
+        }
+        public void Extras()
+        {
+            if (f1[0] != null)
+            {
+                for (int x = 0; x < i; x++)
+                {
+                    if (f1[x].Aumento != false)
+                    {
+                        f1[x].Mostra();
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Usuarios nao cadastrados");
+            }
+        }
+
+        
+
+    }
+}
